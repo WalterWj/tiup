@@ -139,6 +139,7 @@ func isInstanceAlive(tiupHome, instance string) bool {
 		return false
 	}
 
+	//revive:disable
 	if v, ok := process["pid"]; !ok {
 		return false
 	} else if pid, ok := v.(float64); !ok {
@@ -148,6 +149,7 @@ func isInstanceAlive(tiupHome, instance string) bool {
 	} else {
 		return exist
 	}
+	//revive:enable
 }
 
 func readDsn(dir, component string) []*endpoint {
@@ -192,10 +194,7 @@ func selectEndpoint(endpoints []*endpoint) *endpoint {
 	l.TextStyle = ui.NewStyle(ui.ColorWhite)
 	l.SelectedRowStyle = ui.NewStyle(ui.ColorGreen)
 	l.WrapText = false
-	size := 16
-	if len(endpoints) < size {
-		size = len(endpoints)
-	}
+	size := min(len(endpoints), 16)
 	l.SetRect(0, 0, 80, size+2)
 
 	ui.Render(l)

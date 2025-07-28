@@ -17,7 +17,6 @@ import (
 	"context"
 	"crypto/tls"
 	"encoding/json"
-	"fmt"
 	"os"
 	"strings"
 	"time"
@@ -32,6 +31,7 @@ import (
 	"github.com/pingcap/tiup/pkg/tui"
 	"github.com/pingcap/tiup/pkg/utils"
 	"golang.org/x/sync/errgroup"
+	"slices"
 )
 
 // TODO: We can make drainer not async.
@@ -43,12 +43,7 @@ func AsyncNodes(spec *spec.Specification, nodes []string, async bool) []string {
 	var notAsyncNodes []string
 
 	inNodes := func(n string) bool {
-		for _, e := range nodes {
-			if n == e {
-				return true
-			}
-		}
-		return false
+		return slices.Contains(nodes, n)
 	}
 
 	for _, c := range spec.ComponentsByStartOrder() {
@@ -257,7 +252,7 @@ func ScaleInCluster(
 		maxReplicas := config.MaxReplicas
 
 		if len(tikvInstances) < maxReplicas {
-			logger.Warnf(fmt.Sprintf("TiKV instance number %d will be less than max-replicas setting after scale-in. TiFlash won't be able to receive data from leader before TiKV instance number reach %d", len(tikvInstances), maxReplicas))
+			logger.Warnf("TiKV instance number %d will be less than max-replicas setting after scale-in. TiFlash won't be able to receive data from leader before TiKV instance number reach %d", len(tikvInstances), maxReplicas)
 		}
 	}
 
@@ -301,7 +296,7 @@ func ScaleInCluster(
 					return err
 				}
 			} else {
-				logger.Warnf(color.YellowString("The component `%s` will become tombstone, maybe exists in several minutes or hours, after that you can use the prune command to clean it",
+				logger.Warnf("%s", color.YellowString("The component `%s` will become tombstone, maybe exists in several minutes or hours, after that you can use the prune command to clean it",
 					component.Name()))
 			}
 		}
@@ -327,7 +322,7 @@ func ScaleInCluster(
 					return err
 				}
 			} else {
-				logger.Warnf(color.YellowString("The component `%s` will become tombstone, maybe exists in several minutes or hours, after that you can use the prune command to clean it",
+				logger.Warnf("%s", color.YellowString("The component `%s` will become tombstone, maybe exists in several minutes or hours, after that you can use the prune command to clean it",
 					component.Name()))
 			}
 		}
